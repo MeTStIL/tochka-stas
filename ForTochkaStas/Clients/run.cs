@@ -6,7 +6,6 @@ class HotelCapacity
 {
     static bool CheckCapacity(int maxCapacity, List<Guest> guests)
     {
-
         var queue = new Queue<Guest>();
 
         var guestSort = guests.OrderBy(e => e.CheckOut).ToList();
@@ -24,7 +23,8 @@ class HotelCapacity
                     return false;
             }
         }
-        return true; 
+
+        return true;
     }
 
 
@@ -40,13 +40,12 @@ class HotelCapacity
     {
         using var input = new StreamReader(Console.OpenStandardInput());
         using var output = new StreamWriter(Console.OpenStandardOutput());
-        
+
         var maxCapacity = int.Parse(input.ReadLine());
         var n = int.Parse(input.ReadLine());
-        
+
         var guests = new List<Guest>();
-
-
+        
         for (var i = 0; i < n; i++)
         {
             var line = input.ReadLine();
@@ -54,11 +53,9 @@ class HotelCapacity
             guests.Add(guest);
         }
 
-
         var result = CheckCapacity(maxCapacity, guests);
-
-
-        Console.WriteLine(result ? "True" : "False");
+        
+        output.WriteLine(result ? "True" : "False");
     }
 
 
@@ -66,14 +63,12 @@ class HotelCapacity
     static Guest ParseGuest(string json)
     {
         var guest = new Guest();
-
-
+        
         // Извлекаем имя
         Match nameMatch = Regex.Match(json, "\"name\"\\s*:\\s*\"([^\"]+)\"");
         if (nameMatch.Success)
             guest.Name = nameMatch.Groups[1].Value;
-
-
+        
         // Извлекаем дату заезда
         Match checkInMatch = Regex.Match(json, "\"check-in\"\\s*:\\s*\"([^\"]+)\"");
         if (checkInMatch.Success)
@@ -82,8 +77,7 @@ class HotelCapacity
             var checkInMatchDate = DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
             guest.CheckIn = checkInMatchDate;
         }
-
-
+        
         // Извлекаем дату выезда
         Match checkOutMatch = Regex.Match(json, "\"check-out\"\\s*:\\s*\"([^\"]+)\"");
         if (checkOutMatch.Success)
@@ -92,8 +86,7 @@ class HotelCapacity
             var checkOutDate = DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
             guest.CheckOut = checkOutDate;
         }
-
-
+        
         return guest;
     }
 }
