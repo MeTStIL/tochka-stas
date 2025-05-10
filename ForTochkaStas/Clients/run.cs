@@ -42,7 +42,12 @@ class HotelCapacity
         using var output = new StreamWriter(Console.OpenStandardOutput());
 
         var maxCapacity = int.Parse(input.ReadLine());
-        var n = int.Parse(input.ReadLine());
+        var cn = input.ReadLine();
+        var n = 0;
+        if (string.Empty == cn)
+            n = int.Parse(input.ReadLine());
+        else
+            n = int.Parse(cn);
 
         var guests = new List<Guest>();
         
