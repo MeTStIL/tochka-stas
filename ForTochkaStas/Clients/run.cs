@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
 
@@ -7,37 +6,56 @@ class HotelCapacity
 {
     static bool CheckCapacity(int maxCapacity, List<Guest> guests)
     {
-        // TODO: реализация алгоритма
-        return true; // или false
+
+        var queue = new Queue<Guest>();
+
+        var guestSort = guests.OrderBy(e => e.CheckOut).ToList();
+
+        foreach (var guest in guestSort)
+        {
+            if (queue.Count < maxCapacity)
+                queue.Enqueue(guest);
+            else
+            {
+                var curr = queue.Dequeue();
+                if (guest.CheckIn >= curr.CheckOut)
+                    queue.Enqueue(guest);
+                else
+                    return false;
+            }
+        }
+        return true; 
     }
 
 
     class Guest
     {
         public string Name { get; set; }
-        public string CheckIn { get; set; }
-        public string CheckOut { get; set; }
+        public DateTime CheckIn { get; set; }
+        public DateTime CheckOut { get; set; }
     }
 
 
     static void Main()
     {
-        int maxCapacity = int.Parse(Console.ReadLine());
-        int n = int.Parse(Console.ReadLine());
+        using var input = new StreamReader(Console.OpenStandardInput());
+        using var output = new StreamWriter(Console.OpenStandardOutput());
+        
+        var maxCapacity = int.Parse(input.ReadLine());
+        var n = int.Parse(input.ReadLine());
+        
+        var guests = new List<Guest>();
 
 
-        List<Guest> guests = new List<Guest>();
-
-
-        for (int i = 0; i < n; i++)
+        for (var i = 0; i < n; i++)
         {
-            string line = Console.ReadLine();
-            Guest guest = ParseGuest(line);
+            var line = input.ReadLine();
+            var guest = ParseGuest(line);
             guests.Add(guest);
         }
 
 
-        bool result = CheckCapacity(maxCapacity, guests);
+        var result = CheckCapacity(maxCapacity, guests);
 
 
         Console.WriteLine(result ? "True" : "False");
@@ -59,13 +77,21 @@ class HotelCapacity
         // Извлекаем дату заезда
         Match checkInMatch = Regex.Match(json, "\"check-in\"\\s*:\\s*\"([^\"]+)\"");
         if (checkInMatch.Success)
-            guest.CheckIn = checkInMatch.Groups[1].Value;
+        {
+            var dateString = checkInMatch.Groups[1].Value;
+            var checkInMatchDate = DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            guest.CheckIn = checkInMatchDate;
+        }
 
 
         // Извлекаем дату выезда
         Match checkOutMatch = Regex.Match(json, "\"check-out\"\\s*:\\s*\"([^\"]+)\"");
         if (checkOutMatch.Success)
-            guest.CheckOut = checkOutMatch.Groups[1].Value;
+        {
+            var dateString = checkOutMatch.Groups[1].Value;
+            var checkOutDate = DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            guest.CheckOut = checkOutDate;
+        }
 
 
         return guest;
